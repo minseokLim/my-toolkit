@@ -1,12 +1,18 @@
 package com.minseoklim.util
 
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Comment
 import java.io.File
 
 fun File.extractAllTextsFromHtml(): Set<String> {
     val document = Jsoup.parse(this)
-    return document.allElements
+    val scriptElements = document.getElementsByTag("script")
+    return (document.allElements - scriptElements)
+        .asSequence()
         .filter { elem -> elem.hasText() }
+        .filter { elem -> elem.children().isEmpty() }
+        .filter { elem -> !elem.nodeStream().allMatch { it is Comment } }
+        .filter { elem -> !elem.text().contains("<%@ page") }
         .map { it.text() }
         .toSet()
 }
