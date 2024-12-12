@@ -11,3 +11,13 @@ fun File.extractAllIncludedFiles(): List<File> {
         listOf(this)
     }
 }
+
+fun File.extractAllIncludedDirectories(): List<File> {
+    return if (this.isDirectory) {
+        this.listFiles()!!.flatMap {
+            it.extractAllIncludedDirectories()
+        } + this
+    } else {
+        emptyList()
+    }
+}
